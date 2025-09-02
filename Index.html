@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="https://use.typekit.net/zxf5egs.css">
+  <title>Security Pay</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: "scandia-web", sans-serif;
+      font-style: normal;
+      font-weight: 500;
+    }
+
+    body {
+      margin: 0;
+      font-family: scandia-web, sans-serif;
+      background: #1E1E1E;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .screen {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      width: 100%;
+      height: 100vh;
+      padding: 20px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: #1E1E1E;
+    }
+
+    .active {
+      display: flex;
+    }
+
+    img {
+      max-width: 60%;
+      height: auto;
+      margin: 20px 0;
+    }
+
+
+    h2 {
+      font-size: 1.8rem;
+      margin: 15px 0;
+    }
+
+    p {
+      font-size: 1rem;
+      max-width: 300px;
+    }
+
+    .numpad {
+      font-family: scandia-web;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      justify-content: center;
+      margin-top: 20px;
+      width: 100%;
+      max-width: 350px;
+    }
+
+    .numpad button {
+      background-image: url(assets/tecla.png);
+      background-color: transparent;
+      border: transparent;
+      width: 107px;
+      height: 109px;
+      /* ou #111 */
+      cursor: pointer;
+      color: #fff;
+
+    }
+
+    .numpad button.action {
+      background: #90bcff;
+    }
+
+    .metodos-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr); /* 2 colunas */
+      gap: 10px;
+      max-width: 420px;
+      margin: 0 auto;
+      justify-items: center;
+    }
+
+
+    .digital {
+      background-color: transparent;
+      border: none;
+      width: 100%;
+      max-width: 200px;
+      height: auto;
+      padding: 10px;
+      cursor: pointer;
+    }
+
+    .digital img {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+    }
+
+    .back-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      padding: 10px 15px;
+      background: transparent;
+      border: none;
+      font-size: 2rem;
+      color: white;
+      cursor: pointer;
+      z-index: 1000;
+    }
+
+    /* Botao Digital*/
+    .digitall {
+      background: transparent;
+      border: none;
+      width: 100%;
+      max-width: 200px;
+      height: auto;
+      padding: 10px;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+      /* ADICIONADO */
+    }
+
+    /* Quando pressionado */
+    .digitall.pressionado {
+      transform: scale(1.15);
+      /* Cresce 15% */
+    }
+
+    .loading-spinner {
+      border: 8px solid #f3f3f3;
+      /* Cor da borda */
+      border-top: 8px solid #3498db;
+      /* Cor da parte ativa */
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      margin-top: 20px;
+      animation: spin 1s linear infinite;
+    }
+
+    /* Animação de rotação */
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Gradiente estilizado e animado */
+    #gradienteBiometria {
+      position: absolute;
+      width: 683px;
+      height: 904px;
+      top: 50%;
+      /* vamos centralizar aproximado */
+      left: 50%;
+      transform: translate(-50%, 100%) scale(0);
+      border-radius: 0;
+      background: radial-gradient(50% 100% at 50% 100%,
+          rgba(27, 79, 175, 1) 30%,
+          rgba(50, 90, 164, 0) 100%);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 1.0s ease, opacity 1.0s ease;
+      z-index: 5;
+      /* atrás do botão biometria */
+    }
+
+    /* Classe para ativar a animação */
+    #gradienteBiometria.ativo {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+    }
+
+
+    @media (max-width: 480px) {
+      h2 {
+        font-size: 1.4rem;
+      }
+
+      p {
+        font-size: 0.9rem;
+      }
+
+      img {
+        max-width: 80%;
+      }
+
+      .numpad button {
+        font-size: 1.2rem;
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Splash Screen -->
+  <div id="splash" class="screen active" onclick="hideSplash()" style="cursor: pointer;">
+    <img src="assets/Logo1.png" alt="Logo Security Pay" style="padding: 30px 50px; width: 60%; border-radius: 70px;" />
+  </div>
+
+  <!-- Home Screen -->
+  <div id="home" class="screen">
+    <img src="assets/Logoimg.png" style="padding: 30px 50px; width: 60%; border-radius: 70px;" alt="" />
+    <p style="font-family: scandia-web; font-size: 25px;">
+      Seja bem-vindo ao <b>Security Pay</b>, sua plataforma de pagamentos via
+      biometria.
+    </p>
+    <button
+      style="background: #0052cc; border: none; border-radius: 25px; padding: 15px 30px; color: white; font-size: 32px; cursor: pointer; margin-top: 15px; width: 80%; max-width: 350px; font-family: scandia-web "
+      onclick="goTo('loading')">Iniciar</button>
+    <img src="assets/minilogo.png"
+      style="position: fixed;bottom: 0; left: 50%;transform: translateX(-50%);width: 150px;height: 30px; z-index: 1000;" />
+  </div>
+
+  <!-- Loading -->
+  <div id="loading" class="screen" style="background-color:#3e43ea;;">
+    <button class="back-btn" onclick="goBack()">
+      <img src="assets/Voltar.png" alt="Voltar" style="width: 56px; height: 56px;" />
+    </button>
+    <img src="assets/Logo.png" alt="Loading" />
+
+  </div>
+
+  <!-- Valor Cobrado -->
+  <div id="valor" class="screen">
+    <button class="back-btn" onclick="goBack()">
+      <img src="assets/Voltar.png" alt="Voltar" style="text-align: left;width: 56px; height: 56px;" />
+    </button>
+    <h2 style="font-family: scandia-web; font-size: 55px; font-weight: 700;">R$ <span id="valorDisplay">0,00</span></h2>
+    <div class="numpad" style="font-family: scandia-web;">
+      <button style="font-size: 44px;" onclick="addNumber(1)">1</button>
+      <button style="font-size: 44px;" onclick="addNumber(2)">2</button>
+      <button style="font-size: 44px;" onclick="addNumber(3)">3</button>
+      <button style="font-size: 44px;" onclick="addNumber(4)">4</button>
+      <button style="font-size: 44px;" onclick="addNumber(5)">5</button>
+      <button style="font-size: 44px;" onclick="addNumber(6)">6</button>
+      <button style="font-size: 44px;" onclick="addNumber(7)">7</button>
+      <button style="font-size: 44px;" onclick="addNumber(8)">8</button>
+      <button style="font-size: 44px;" onclick="addNumber(9)">9</button>
+      <button style="font-size: 44px;" onclick="addNumber(0)">0</button>
+      <button style="font-size: 44px;" onclick="clearValor()">⌫</button>
+    </div>
+    <button
+      style="background: #0052cc; border: none; border-radius: 25px; padding: 27px 30px; color: white; font-size: 32px; cursor: pointer; margin-top: 15px; width: 80%; max-width: 350px; font-family: scandia-web "
+      class="action" onclick="goTo('metodos')">Cobrar</button>
+  </div>
+
+  <!-- Métodos de Pagamento -->
+  <div id="metodos" class="screen">
+    <button class="back-btn" onclick="goBack()">
+      <img src="assets/Voltar.png" alt="Voltar" style="width: 56px; height: 56px;" />
+    </button>
+    <h2>Método de Pagamento</h2>
+    
+    <div class="metodos-grid">
+      <button class="digital" onclick="goTo('biometria')">
+        <img src="assets/PBiometria.png" alt="Biometria" />
+      </button>
+      <button class="digital" onclick="goTo('loading2')">
+        <img src="assets/Pix.png" alt="Pix" />
+      </button>
+      <button class="digital" onclick="goTo('loading2')">
+        <img src="assets/Débito.png" alt="Débito" />
+      </button>
+      <button class="digital" onclick="goTo('loading2')">
+        <img src="assets/Crédito.png" alt="Crédito" />
+      </button>
+    </div>
+    <img src="assets/minilogo.png"
+      style="position: fixed;bottom: 0; left: 50%;transform: translateX(-50%);width: 150px; height: 25px; z-index: 1000; " />
+  </div>
+
+  <!-- Tela Biometria -->
+  <div id="biometria" class="screen" style="position: relative;">
+    <button class="back-btn" onclick="goBack()">
+      <img src="assets/Voltar.png" alt="Voltar" style="width: 56px; height: 56px;" />
+    </button>
+    <h2 style="font-family: scandia-web; font-size: 55px; font-weight: 700;">
+      <b style="font-weight: 700;">R$ </b><span id="valorBiometria"><b>0,00</b></span>
+    </h2>
+    <p style="font-family: scandia-web; font-size: 20px;">Pague utilizando sua biometria</p>
+    <!-- Botão biometria -->
+    <button class="digitall" id="botaoBiometria"
+      style="position: relative; z-index: 10; border: none; background: transparent; cursor: pointer;">
+      <img src="assets/Biometria.png" alt="Biometria" style="width: 100%;" />
+    </button>
+    <!-- Fundo gradiente animado (inicialmente escondido) -->
+    <div id="gradienteBiometria"></div>
+    <img src="assets/minilogo.png"
+      style="position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); height: 30px; width: 150px; z-index: 1000;" />
+  </div>
+
+
+  <!-- Pagamento Realizado -->
+  <div id="sucesso" class="screen">
+    <h2 style="font-family: scandia-web; font-size: 55px; font-weight: 700;">Pagamento Realizado</h2>
+    <h2 style="font-family: scandia-web;">
+      <b>R$ </b><span id="valorSucesso"><b>0,00</b></span>
+    </h2>
+    <img src="assets/Sucesso.png" alt="Sucesso" />
+    <button
+      style="background: #0052cc; border: none; border-radius: 25px; padding: 15px 30px; color: white; font-size: 20px; cursor: pointer; margin-top: 15px; width: 80%; max-width: 350px; font-family: scandia-web"
+      onclick="goTo('splash')">Voltar para Home</button>
+    <img src="assets/minilogo.png"
+      style="position: fixed;bottom: 0; left: 50%;transform: translateX(-50%);width: 150px; height: 30px; z-index: 1000;" />
+  </div>
+
+  <!-- Loading2 -->
+  <div id="loading2" class="screen" style="background-color:#3e43ea;;">
+    <button class="back-btn" onclick="goBack()">
+      <img src="assets/Voltar.png" alt="Voltar" style="width: 50px; height: 50px;" />
+    </button>
+    <img src="assets/Logo.png" alt="Loading" />
+    <!-- Bolinha de carregamento -->
+    <div class="loading-spinner"></div>
+
+  </div>
+
+  <!-- Método Indisponível -->
+  <div id="indisponivel" class="screen">
+    <h2 style="font-family: scandia-web; font-size: 48px; font-weight: 700;">Método Indisponível</h2>
+    <img src="" />
+    <img src="assets/recusado.png" />
+    <button
+      style="background: #0052cc; border: none; border-radius: 25px; padding: 15px 30px; color: white; font-size: 1.1rem; cursor: pointer; margin-top: 15px; width: 80%; max-width: 350px; font-family: Scandia "
+      onclick="goTo('metodos')">Utilizar outro método</button>
+    <img src="assets/minilogo.png"
+      style="position: fixed;bottom: 0; left: 50%;transform: translateX(-50%);width: 150px; height: 30px; z-index: 1000;" />
+  </div>
+
+
+  <script>
+    let valor = 0; // valor em centavos
+    let historyStack = ["splash"];
+    let splashReady = false;
+
+    function goTo(screen) {
+      document.querySelectorAll(".screen").forEach((s) =>
+        s.classList.remove("active")
+      );
+      document.getElementById(screen).classList.add("active");
+      historyStack.push(screen);
+
+      if (screen === "loading") {
+        setTimeout(() => goTo("valor"), 1500);
+      }
+
+      if (screen === "loading2") {
+        setTimeout(() => goTo("indisponivel"), 1500);
+      }
+
+      const valorFormatado = (valor / 100).toFixed(2).replace(".", ",");
+
+      if (screen === "biometria") {
+        const elBio = document.getElementById("valorBiometria");
+        if (elBio) elBio.innerText = valorFormatado;
+      }
+
+      if (screen === "sucesso") {
+        const elSucesso = document.getElementById("valorSucesso");
+        if (elSucesso) elSucesso.innerText = valorFormatado;
+      }
+
+    }
+
+
+    function goBack() {
+      if (historyStack.length > 1) {
+        historyStack.pop();
+        let prev = historyStack[historyStack.length - 1];
+        document.querySelectorAll(".screen").forEach((s) =>
+          s.classList.remove("active")
+        );
+        document.getElementById(prev).classList.add("active");
+      }
+    }
+
+    function addNumber(num) {
+      valor = valor * 10 + num;
+      document.getElementById("valorDisplay").innerText = (valor / 100)
+        .toFixed(2)
+        .replace(".", ",");
+    }
+
+    function clearValor() {
+      valor = 0;
+      document.getElementById("valorDisplay").innerText = "0,00";
+    }
+
+    function hideSplash() {
+      if (!splashReady) return;
+      document.getElementById("splash").classList.remove("active");
+      goTo("home");
+    }
+
+    // Libera o clique no splash após 1.5s
+    setTimeout(() => {
+      splashReady = true;
+    }, 1500);
+
+
+    //gradient
+    const botao = document.getElementById('botaoBiometria');
+    const gradiente = document.getElementById('gradienteBiometria');
+
+    let pressionado = false;
+
+    function mostrarGradiente() {
+      pressionado = true;
+      gradiente.classList.add('ativo');
+    }
+
+    function esconderGradienteERedirecionar() {
+      if (!pressionado) return; // só executa se tinha pressionado antes
+      pressionado = false;
+      gradiente.classList.remove('ativo');
+      goTo('sucesso');  // usa sua função de navegação customizada
+    }
+
+    // Eventos mouse
+    botao.addEventListener('mousedown', mostrarGradiente);
+    document.addEventListener('mouseup', esconderGradienteERedirecionar);
+    document.addEventListener('mouseleave', esconderGradienteERedirecionar);
+
+    // Eventos touch (mobile)
+    botao.addEventListener('touchstart', mostrarGradiente);
+    document.addEventListener('touchend', esconderGradienteERedirecionar);
+    document.addEventListener('touchcancel', esconderGradienteERedirecionar);
+
+    // Botao Precionado
+    const botaoBiometria = document.querySelector('.digitall');
+
+    botaoBiometria.addEventListener('mousedown', () => {
+      botaoBiometria.classList.add('pressionado');
+    });
+
+    botaoBiometria.addEventListener('mouseup', () => {
+      botaoBiometria.classList.remove('pressionado');
+    });
+
+    botaoBiometria.addEventListener('mouseleave', () => {
+      botaoBiometria.classList.remove('pressionado');
+    });
+
+    botaoBiometria.addEventListener('touchstart', () => {
+      botaoBiometria.classList.add('pressionado');
+    });
+
+    botaoBiometria.addEventListener('touchend', () => {
+      botaoBiometria.classList.remove('pressionado');
+    });
+  </script>
+</body>
+
+</html>
